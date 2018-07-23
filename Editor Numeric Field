@@ -1,0 +1,74 @@
+        (function (factory) {
+            if (typeof define === 'function' && define.amd) {
+                // AMD
+                define(['jquery', 'datatables', 'datatables-editor'], factory);
+            }
+            else if (typeof exports === 'object') {
+                // Node / CommonJS
+                module.exports = function ($, dt) {
+                    if (!$) { $ = require('jquery'); }
+                    factory($, dt || $.fn.dataTable || require('datatables'));
+                };
+            }
+            else if (jQuery) {
+                // Browser standard
+                factory(jQuery, jQuery.fn.dataTable);
+            }
+        }(function ($, DataTable) {
+            'use strict';
+
+
+            if (!DataTable.ext.editorFields) {
+                DataTable.ext.editorFields = {};
+            }
+
+            var _fieldTypes = DataTable.Editor ?
+                DataTable.Editor.fieldTypes :
+                DataTable.ext.editorFields;
+
+
+            _fieldTypes.numeric = {
+                create: function (conf) {
+                    conf._input = $('<input/>').attr($.extend({
+                        id: DataTable.Editor.safeId(conf.id),
+                        type: 'text'
+                    }, conf.attr || {}));
+                    conf._input.on("focus", function () { $(this).select(); });
+                    conf._input.on("keydown", function (evtObj) {
+                        var key = evtObj.key;
+                        if (key == "." && this.value.indexOf(".") > -1) {
+                            evtObj.preventDefault();
+                            return false; 
+                        }
+                       // debugger;
+                    }).on("paste drop", function (evtObj) {
+                        // strip the number of all characters that are not part of the actual number
+                        let paste = evtObj.clipboardData || window.clipboardData || evtObj.originalEvent.clipboardData || event.dataTransfer;
+                        let str = paste.getData("text").replace(/[^0-9\.-]+/g, "");
+                        var number = Number(str);
+                        this.value = isNaN(number) ? 0 : number;
+                        evtObj.preventDefault();
+                    })
+                    return conf._input[0];
+                },
+
+                get: function (conf) {
+
+                    return conf._input.val();
+                },
+
+                set: function (conf, val) {
+                    conf._input
+                        .val(val);
+                },
+
+                enable: function (conf) {
+                    conf._input.prop('disabled', false);
+                },
+
+                disable: function (conf) {
+                    conf._input.prop('disabled', true);
+                }
+            };
+
+        }));
