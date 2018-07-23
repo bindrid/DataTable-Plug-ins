@@ -50,8 +50,10 @@
         },
 
         get: function (conf) {
-
-            var val = parseFloat(conf._input.val());
+            // user is allowed to use commas to make the number easier to read so 
+            // so need to remove them here.
+            var raw = conf._input.val();
+            var val = parseFloat(raw.replace(/[^0-9\.-]+/g, ""));
             if (isNaN(val) || val === "") return 0;
             else return val;
         },
