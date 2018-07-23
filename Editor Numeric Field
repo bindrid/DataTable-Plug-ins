@@ -34,10 +34,9 @@
                 type: 'text'
             }, conf.attr || {}));
             conf._input.on("focus", function () { $(this).select(); });
-            //conf._input.on("keydown", function (evtObj) {
-            //    var s =  keydownHandler(evtObj);
-            //    return s;
-            //})
+            conf._input.on("keydown", function (evtObj) {
+                return keydownHandler(evtObj);
+            });
             conf._input.on("paste drop", function (evtObj) {
                 // event handler for drop and paste
                 // strip the number of all characters that are not part of the actual number
@@ -51,7 +50,7 @@
         },
 
         get: function (conf) {
-         
+
             var val = parseFloat(conf._input.val());
             if (isNaN(val) || val === "") return 0;
             else return val;
@@ -61,7 +60,9 @@
             conf._input
                 .val(val);
         },
-
+        canReturnSubmit: function (opts, node) {
+            return true;
+        },
         enable: function (conf) {
             conf._input.prop('disabled', false);
         },
@@ -77,7 +78,7 @@
 }));
 
 function keydownHandler(evtObj) {
- 
+
     // length greater than 1 assumed to be
     // nonprintable key
     if (evtObj.key.length > 1) {
@@ -88,11 +89,11 @@ function keydownHandler(evtObj) {
             //default behavior is good
             //case "Tab":
             //case "Enter":
-                            
 
-             // decimal from keypad.
+
+            // decimal from keypad.
             case "Decimal":
-                if(evtObj.target.value.indexOf(".") > -1){
+                if (evtObj.target.value.indexOf(".") > -1) {
                     evtObj.preventDefault();
                     return false;
                 }
@@ -100,12 +101,12 @@ function keydownHandler(evtObj) {
 
         }
     }
-    else if (evtObj.ctrlKey && (evtObj.key == "v" || evtObj.key == "V" || evtObj.key == "c" || evtObj.key == "C") ) {
+    else if (evtObj.ctrlKey && (evtObj.key == "v" || evtObj.key == "V" || evtObj.key == "c" || evtObj.key == "C")) {
         // allow keyboard copy and paste actions
     }
     else {
-           
-        if (evtObj.key == "."){
+
+        if (evtObj.key == ".") {
             if (evtObj.target.value.indexOf(".") > -1) {
                 evtObj.preventDefault();
                 return false;
@@ -117,5 +118,5 @@ function keydownHandler(evtObj) {
         }
     }
     return true;
-            
+
 }
