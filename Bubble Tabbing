@@ -1,0 +1,69 @@
+// Activate the bubble editor on click of a table cell
+$('#example').on( 'click', 'tbody td', function (e) {
+    editor.bubble(this, { submitOnBlur: true });
+} );
+ 
+editor.on("open", function (ev,type) {
+    var current = $($("#example").DataTable().rows(editor.ids()).cell(editor.modifier()).node());
+ 
+    if (type === "bubble" || type=== "inline") {
+        $(document).on('keydown.editor', function (e) {
+            var kc = e.keyCode;
+            console.log(kc)
+            if (kc === 9 || kc === 37 || kc === 38 || kc === 39 || kc === 40) {
+                e.preventDefault();
+                current.removeClass("focus");
+            }
+            // for tabbing and shift tabbing.
+            if (kc === 9) {
+                if (e.shiftKey && current.prevAll("td.editable").length) {
+                    // One cell to the left (skipping the first column)
+                    current.prevAll("td.editable").first().focus().click().addClass("focus");
+                    console.log("prev cell");
+                }
+                else if (e.shiftKey) {
+                    // Up to the previous row
+                    current.parent().prev().children(".editable").last(0).focus().click().addClass("focus");
+                    console.log("prev row")
+                }
+                else if (current.nextAll("td.editable").length) {
+                    current.nextAll("td.editable").first().focus().click().addClass("focus");
+                    console.log("next cell")
+                }
+                else if (current.parent().next().length) {
+                    current.parent().next().children(".editable").first(0).focus().click().addClass("focus");
+                }
+            }
+            //left arrow
+            else if (kc === 37) {
+                if (current.prevAll("td.editable").length) {
+                    current.prevAll("td.editable").first().focus().click().addClass("focus");
+                }
+                else {
+                    current.parent().prev().children("td.editable").last(0).focus().click().addClass("focus");
+                }
+            }
+            // Up Arrow
+            else if (kc === 38) {
+                var ci = current.index();
+                current.parent().prev().children().eq(ci).focus().click().addClass("focus");
+            }
+            // right arrow
+            else if (kc === 39) {
+                if (current.nextAll("td.editable").length) {
+                    current.nextAll("td.editable").first().focus().click().addClass("focus");
+                }
+                else {
+                    current.parent().next().children("td.editable").eq(0).focus().click().addClass("focus");
+                }
+            }
+            // down arrow
+            else if (kc === 40) {
+                var ci = current.index();
+                current.parent().next().children().eq(ci).focus().click().addClass("focus");
+            }
+        });
+    }
+}).on('close', function () {
+    $(document).off('keydown.editor');
+});
